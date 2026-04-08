@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Client Design Brief — Packaging Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --ink:    #12112A;
+  --gold:   #C8A84B;
+  --gold2:  #E8C96D;
+  --cream:  #F8F5EF;
+  --card:   #FFFFFF;
+  --field:  #F5F3EE;
+  --border: #E3DDD3;
+  --mid:    #A09A90;
+  --soft:   #6B6560;
+  --red:    #B93A2B;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ─── HERO ─────────────────────────────────────────────────────────────────── */
+.hero {
+  background: var(--ink);
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold2) 50%, var(--gold) 100%);
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(201,168,75,0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 48px 28px 44px;
+}
+.hero-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 28px; height: 1px;
+  background: var(--gold);
+}
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(30px, 5vw, 46px);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.12;
+  margin-bottom: 12px;
+}
+.hero-title em { font-style: italic; color: var(--gold2); }
+.hero-sub {
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.45);
+  font-weight: 300;
+  line-height: 1.6;
+  max-width: 520px;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 22px;
+  background: rgba(201,168,75,0.12);
+  border: 1px solid rgba(201,168,75,0.3);
+  border-radius: 100px;
+  padding: 6px 14px;
+  font-size: 11px;
+  color: var(--gold2);
+  font-weight: 500;
+}
+.hero-badge svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+/* ─── PAGE ─────────────────────────────────────────────────────────────────── */
+.page {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 28px 80px;
+}
+
+/* ─── INTRO ────────────────────────────────────────────────────────────────── */
+.intro-card {
+  margin-top: 28px;
+  background: var(--card);
+  border-radius: 14px;
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  box-shadow: 0 2px 14px rgba(18,17,42,0.05);
+}
+.intro-icon {
+  width: 36px; height: 36px; min-width: 36px;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+}
+.intro-icon svg { width: 17px; height: 17px; stroke: #fff; }
+.intro-text {
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--soft);
+}
+.intro-text strong { color: var(--ink); }
+
+/* ─── SECTION ──────────────────────────────────────────────────────────────── */
+.section {
+  margin-top: 22px;
+  background: var(--card);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 18px rgba(18,17,42,0.05);
+}
+.sec-head {
+  display: flex;
+  align-items: stretch;
+  background: var(--ink);
+  position: relative;
+}
+.sec-head::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold) 0%, transparent 70%);
+}
+.sec-num-box {
+  background: var(--gold);
+  padding: 0 18px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 54px;
+  flex-shrink: 0;
+}
+.sec-text-wrap { padding: 16px 20px; }
+.sec-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: #fff;
+  line-height: 1.2;
+}
+.sec-desc {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 3px;
+  font-weight: 300;
+}
+.sec-body {
+  padding: 24px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ─── FIELD ────────────────────────────────────────────────────────────────── */
+.field { display: flex; flex-direction: column; }
+.field-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.opt-tag {
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--mid);
+  background: var(--field);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 1px 8px;
+}
+.field-hint {
+  font-size: 11.5px;
+  color: var(--mid);
+  font-style: italic;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+.field input,
+.field textarea {
+  width: 100%;
+  background: var(--field);
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  padding: 12px 14px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13.5px;
+  font-weight: 400;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+  line-height: 1.55;
+}
+.field input::placeholder,
+.field textarea::placeholder { color: #C5BFB5; font-weight: 300; }
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--gold);
+  background: #FFFCF4;
+  box-shadow: 0 0 0 3.5px rgba(200,168,75,0.12);
+}
+.field textarea { resize: vertical; min-height: 84px; }
+
+/* Required gold border */
+.req input, .req textarea { border-left: 3px solid var(--gold); }
+
+/* Error */
+.err-state input,
+.err-state textarea {
+  border-color: var(--red) !important;
+  box-shadow: 0 0 0 3px rgba(185,58,43,0.1) !important;
+}
+.err-msg {
+  display: none;
+  font-size: 11px;
+  color: var(--red);
+  margin-top: 5px;
+  font-weight: 500;
+}
+.err-state .err-msg { display: block; }
+
+/* ─── 2-COL GRID ───────────────────────────────────────────────────────────── */
+.row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+@media(max-width: 540px){ .row-2 { grid-template-columns: 1fr; } }
+
+/* ─── THIN RULE ────────────────────────────────────────────────────────────── */
+.rule { height: 1px; background: var(--border); margin: 0 -24px; }
+
+/* ─── SUBMIT ──────────────────────────────────────────────────────────────── */
+.submit-wrap {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 13px;
+}
+.btn-gen {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 15px 38px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(18,17,42,0.22);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-gen::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--gold), var(--gold2));
+}
+.btn-gen:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(18,17,42,0.28); }
+.btn-gen:active { transform: translateY(0); }
+.btn-gen svg { width: 17px; height: 17px; }
+.submit-note { font-size: 11px; color: var(--mid); text-align: center; }
+
+/* ─── SUCCESS ──────────────────────────────────────────────────────────────── */
+#success-banner { display: none; margin-top: 18px; }
+.sb-inner {
+  background: #EEF7F1;
+  border: 1px solid #A8D9B5;
+  border-left: 4px solid #2E9E58;
+  border-radius: 0 10px 10px 0;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: #1B6B3A;
+  font-weight: 500;
+}
+
+/* ─── FOOTER ──────────────────────────────────────────────────────────────── */
+.site-footer {
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--mid);
+  padding: 22px 20px 30px;
+  border-top: 1px solid var(--border);
+  margin-top: 10px;
+}
+.site-footer strong { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Anil Kumbhar</div>
+    <div class="hero-title">Client Design <em>Brief</em></div>
+    <div class="hero-sub">Fill in the details below to help us craft packaging that reflects your brand with precision and elegance.</div>
+    <div class="hero-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+      Gold border = Required field
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    </div>
+    <div class="intro-text">
+      Thank you for choosing us for your packaging project. <strong>Please complete all 7 sections</strong> carefully — the more detail you share, the better we can design packaging that stands out. Click <strong>Generate Brief</strong> at the bottom to download a clean PDF instantly.
+    </div>
+  </div>
+
+  <form id="brief-form" novalidate>
+
+    <!-- 01 Product Information -->
+    <div class="section">
+      <div class="sec-head">
+        <div class="sec-num-box">01</div>
+        <div class="sec-text-wrap">
+          <div class="sec-title">Product Information</div>
+          <div class="sec-desc">Tell us what we are designing for</div>
+        </div>
+      </div>
+      <div class="sec-body">
+        <div class="row-2">
+          <div class="field req" id="f-productName">
+            <div class="field-label">Product Name</div>
+            <div class="field-hint">Official name as it appears on packaging</div>
+            <input type="text" id="productName" placeholder="e.g., GlowPure Face Serum"/>
+            <div class="err-msg">⚠ Required</div>
+          </div>
+          <div class="field req" id="f-productCategory">
+            <div class="field-label">Product Category</div>
+            <div class="field-hint">e.g., Cosmetics, FMCG, Food, Pharma</div>
+            <input type="text" id="productCategory" placeholder="e.g., Skincare / Cosmetics"/>
+            <div class="err-msg">⚠ Required</div>
+          </div>
+        </div>
+        <div class="field req" id="f-productDesc">
+          <div class="field-label">Product Description</div>
+          <div class="field-hint">What is it, what does it do, and what makes it unique?</div>
+          <textarea id="productDesc" rows="3" placeholder="e.g., A lightweight Vitamin C face serum that brightens skin and reduces dark spots. Suitable for all skin types."></textarea>
+          <div class="err-msg">⚠ Required</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 Target Audience -->
+    <div class="section">
+      <div class="sec-head">
+        <div class="sec-num-box">02</div>
+        <div class="sec-text-wrap">
+          <div class="sec-title">Target Audience</div>
+          <div class="sec-desc">Who is this product designed for?</div>
+        </div>
+      </div>
+      <div class="sec-body">
+        <div class="field req" id="f-audience">
+          <div class="field-label">Ideal Customer Profile</div>
+          <div class="field-hint">Age group, gender (if applicable), income segment (premium / mid-range / mass), lifestyle, purchasing habits</div>
+          <textarea id="audience" rows="3" placeholder="e.g., Women aged 25–40, urban, mid-to-premium segment, health-conscious, interested in clean beauty."></textarea>
+          <div class="err-msg">⚠ Required</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 Packaging Specifications -->
+    <div class="section">
+      <div class="sec-head">
+        <div class="sec-num-box">03</div>
+        <div class="sec-text-wrap">
+          <div class="sec-title">Packaging Specifications</div>
+          <div class="sec-desc">Physical details of the packaging</div>
+        </div>
+      </div>
+      <div class="sec-body">
+        <div class="row-2">
+          <div class="field req" id="f-packType">
+            <div class="field-label">Packaging Type</div>
+            <div class="field-hint">e.g., Label, Bottle, Pouch, Box, Tube, Jar</div>
+            <input type="text" id="packType" placeholder="e.g., Glass Bottle with Label"/>
+            <div class="err-msg">⚠ Required</div>
+          </div>
+          <div class="field req" id="f-packSize">
+            <div class="field-label">Size / Dimensions</div>
+            <div class="field-hint">Height × Width × Depth in mm/cm or net volume</div>
+            <input type="text" id="packSize" placeholder="e.g., 50ml / 120mm height"/>
+            <div class="err-msg">⚠ Required</div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Packaging Material <span class="opt-tag">Optional</span></div>
+          <div class="field-hint">e.g., Glass, PET Plastic, Kraft Paper, Aluminium Foil</div>
+          <input type="text" id="packMaterial" placeholder="e.g., Frosted Glass Bottle"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 Brand Identity -->
+    <div class="section">
+      <div class="sec-head">
+        <div class="sec-num-box">04</div>
+        <div class="sec-text-wrap">
+          <div class="sec-title">Brand Identity &amp; Design Direction</div>
+          <div class="sec-desc">Visual language and brand personality</div>
+        </div>
+      </div>
+      <div class="sec-body">
+        <div class="row-2">
+          <div class="field req" id="f-brandName">
+            <div class="field-label">Brand Name</div>
+            <div class="field-hint">As it should appear on the design</div>
+            <input type="text" id="brandName" placeholder="e.g., LUMÉ Skincare"/>
+            <div class="err-msg">⚠ Required</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Tagline / Slogan <span class="opt-tag">Optional</span></div>
+            <div class="field-hint">Short product or brand tagline</div>
+            <input type="text" id="tagline" placeholder="e.g., Pure. Radiant. You."/>
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field req" id="f-designStyle">
+            <div class="field-label">Preferred Design Style</div>
+            <div class="field-hint">e.g., Premium, Minimal, Luxury, Bold, Organic, Playful</div>
+            <input type="text" id="designStyle" placeholder="e.g., Luxury Minimal — Gold & White"/>
+            <div class="err-msg">⚠ Required</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Colour Preferences <span class="opt-tag">Optional</span></div>
+            <div class="field-hint">Specific colours or describe a mood</div>
+            <input type="text" id="colors" placeholder="e.g., Gold, Ivory, Deep Navy"/>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Reference Designs <span class="opt-tag">Optional</span></div>
+          <div class="field-hint">Brands or competitor packaging styles you admire</div>
+          <textarea id="references" rows="2" placeholder="e.g., I like the clean aesthetic of The Ordinary and the premium feel of Forest Essentials."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 DESIGN CONTENT (renamed) -->
+    <div class="section">
+      <div class="sec-head">
+        <div class="sec-num-box">05</div>
+        <div class="sec-text-wrap">
+          <div class="sec-title">Design Content</div>
+          <div class="sec-desc">All text and information that will appear on the design</div>
+        </div>
+      </div>
+      <div class="sec-body">
+        <div class="field req" id="f-ingredients">
+          <div class="field-label">Ingredients / Composition</div>
+          <div class="field-hint">Full ingredient list to be printed on the design</div>
+          <textarea id="ingredients" rows="3" placeholder="e.g., Aqua, Niacinamide 10%, Ascorbic Acid 5%, Hyaluronic Acid, Glycerin, Aloe Vera Extract..."></textarea>
+          <div class="err-msg">⚠ Required</div>
+        </div>
+        <div class="rule"></div>
+        <div class="field req" id="f-benefits">
+          <div class="field-label">Key Benefits / Product Highlights</div>
+          <div class="field-hint">Claims or highlights to feature prominently on the design</div>
+          <textarea id="benefits" rows="2" placeholder="e.g., Brightens Skin · Reduces Dark Spots · Paraben-Free · Dermatologist Tested · Vegan"></textarea>
+          <div class="err-msg">⚠ Required</div>
+        </div>
+        <div class="rule"></div>
+        <div class="field req" id="f-mandatoryDetails">
+          <div class="field-label">Mandatory Print Details</div>
+          <div class="field-hint">MRP, Batch No., Mfg. &amp; Expiry Date, Net Weight/Volume, Manufacturer Name &amp; Address, FSSAI/License Numbers, Country of Origin</div>
+          <textarea id="mandatoryDetails" rows="6" placeholder="MRP: ₹499&#10;Batch No.: ___&#10;Mfg. Date: ___     Exp. Date: ___&#10;Net Wt.: 50ml&#10;Mfg. By: [Company Name, Full Address]&#10;FSSAI Lic. No.: ___&#10;Country of Origin: India"></textarea>
+          <div class="err-msg">⚠ Required</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Logo File Note <span class="opt-tag">Optional</span></div>
+          <div class="field-hint">Mention if you'll attach the logo separately (AI / EPS / SVG / PNG preferred), or if logo design is also required</div>
+          <input type="text" id="logoNote" placeholder="e.g., Logo file will be shared on WhatsApp. / Logo redesign also required."/>
+        </div>
+      </div>
+    </div>
+
+    <!-- 06 Printing -->
+    <div class="section">
+      <div class="sec-head">
+        <div class="sec-num-box">06</div>
+        <div class="sec-text-wrap">
+          <div class="sec-title">Printing Information</div>
+          <div class="sec-desc">Production and print method</div>
+        </div>
+      </div>
+      <div class="sec-body">
+        <div class="field">
+          <div class="field-label">Preferred Printing Method <span class="opt-tag">Optional</span></div>
+          <div class="field-hint">If unsure, leave blank — we will recommend based on quantity and budget</div>
+          <input type="text" id="printMethod" placeholder="e.g., Digital Printing / Offset / Flexographic / Not Sure"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- 07 Timeline -->
+    <div class="section">
+      <div class="sec-head">
+        <div class="sec-num-box">07</div>
+        <div class="sec-text-wrap">
+          <div class="sec-title">Project Timeline</div>
+          <div class="sec-desc">Deadlines and any final notes</div>
+        </div>
+      </div>
+      <div class="sec-body">
+        <div class="row-2">
+          <div class="field req" id="f-deadline">
+            <div class="field-label">Expected Deadline</div>
+            <div class="field-hint">Specific date or timeframe</div>
+            <input type="text" id="deadline" placeholder="e.g., By 20th May 2025 / Within 10 days"/>
+            <div class="err-msg">⚠ Required</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Your Name / Company <span class="opt-tag">Optional</span></div>
+            <div class="field-hint">Used in the PDF header</div>
+            <input type="text" id="clientName" placeholder="e.g., Priya Sharma / GlowCo Pvt. Ltd."/>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Additional Notes <span class="opt-tag">Optional</span></div>
+          <div class="field-hint">Any special requirements or last-minute preferences</div>
+          <textarea id="notes" rows="3" placeholder="e.g., Please avoid heavy dark designs. We want the packaging to feel approachable yet luxurious."></textarea>
+        </div>
+      </div>
+    </div>
+
+  </form>
+
+  <div id="success-banner">
+    <div class="sb-inner">✅ Your design brief has been downloaded as a PDF. We will review it and get back to you within 1–2 business days.</div>
+  </div>
+
+  <div class="submit-wrap">
+    <button class="btn-gen" type="button" onclick="generatePDF()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 004.561 21h14.878a2 2 0 001.94-1.515L22 17"/>
+      </svg>
+      Generate &amp; Download PDF Brief
+    </button>
+    <div class="submit-note">Downloads instantly · No data stored or transmitted</div>
+  </div>
+
+</div>
+
+<div class="site-footer">Crafted by <strong>Anil</strong> · Packaging Design Studio · Client Brief Tool</div>
+
+<script>
+const { jsPDF } = window.jspdf;
+function val(id){ return (document.getElementById(id)?.value||'').trim(); }
+
+const REQUIRED = ['productName','productCategory','productDesc','audience','packType','packSize','brandName','designStyle','ingredients','benefits','mandatoryDetails','deadline'];
+
+function validateForm(){
+  let ok = true;
+  REQUIRED.forEach(id => {
+    const w = document.getElementById('f-'+id);
+    if(!val(id)){ w?.classList.add('err-state'); ok=false; }
+    else w?.classList.remove('err-state');
+  });
+  return ok;
+}
+document.querySelectorAll('input,textarea').forEach(el=>{
+  el.addEventListener('input',()=>document.getElementById('f-'+el.id)?.classList.remove('err-state'));
+});
+
+function generatePDF(){
+  if(!validateForm()){
+    document.querySelector('.err-state')?.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  const doc = new jsPDF({unit:'mm',format:'a4'});
+  const PW=210,PH=297,ML=16,MR=194,TW=178;
+  let y=0;
+  const C={ink:[18,17,42],gold:[200,168,75],gold2:[232,201,109],white:[255,255,255],grey:[245,243,238],mid:[160,154,144],soft:[107,101,96],bdr:[227,221,211],cream:[248,245,239]};
+
+  function footer(){
+    const pg=doc.internal.getCurrentPageInfo().pageNumber;
+    doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(...C.mid);
+    doc.text('Client Design Brief  ·  Confidential  ·  Packaging Design Studio',PW/2,PH-8,{align:'center'});
+    doc.text(`${pg}`,MR,PH-8,{align:'right'});
+  }
+  function newPage(){
+    doc.addPage();y=20;
+    doc.setDrawColor(...C.gold);doc.setLineWidth(0.8);doc.line(ML,10,MR,10);
+    footer();
+  }
+  function chk(h){if(y+h>PH-16)newPage();}
+
+  // Cover
+  doc.setFillColor(...C.ink);doc.rect(0,0,PW,62,'F');
+  doc.setFillColor(...C.gold);doc.rect(0,60,PW,1.5,'F');
+  doc.setFillColor(...C.gold2);doc.rect(0,61.5,PW,0.8,'F');
+  doc.setFillColor(...C.gold);doc.rect(0,0,4,62.3,'F');
+  // dots
+  for(let gx=12;gx<PW;gx+=22)for(let gy=8;gy<60;gy+=22){doc.setFillColor(201,168,75);doc.circle(gx,gy,0.35,'F');}
+  doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(...C.gold);doc.setCharSpace(3);
+  doc.text('PACKAGING DESIGN STUDIO',ML+6,16);doc.setCharSpace(0);
+  doc.setFont('helvetica','bold');doc.setFontSize(27);doc.setTextColor(...C.white);
+  doc.text('Client Design Brief',ML+6,32);
+  const cn=val('clientName');
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(175,172,205);
+  doc.text(cn?`Prepared for: ${cn}`:'Packaging Design Onboarding Document',ML+6,43);
+  const now=new Date();const ds=now.toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  doc.setFontSize(8);doc.setTextColor(...C.gold);doc.text(ds,MR,43,{align:'right'});
+  doc.setFillColor(200,168,75,0.14);doc.roundedRect(ML+6,48,54,7.5,3,3,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(7);doc.setTextColor(...C.gold2);
+  doc.text('CONFIDENTIAL · FOR CLIENT USE ONLY',ML+33,52.5,{align:'center'});
+  y=72;footer();
+
+  const secs=[
+    {n:'01',t:'Product Information',fields:[{l:'Product Name',v:val('productName')},{l:'Category',v:val('productCategory')},{l:'Description',v:val('productDesc'),m:true}]},
+    {n:'02',t:'Target Audience',fields:[{l:'Ideal Customer Profile',v:val('audience'),m:true}]},
+    {n:'03',t:'Packaging Specifications',fields:[{l:'Packaging Type',v:val('packType')},{l:'Size / Dimensions',v:val('packSize')},{l:'Material',v:val('packMaterial')||'—'}]},
+    {n:'04',t:'Brand Identity & Design Direction',fields:[{l:'Brand Name',v:val('brandName')},{l:'Tagline',v:val('tagline')||'—'},{l:'Design Style',v:val('designStyle')},{l:'Colour Preferences',v:val('colors')||'—'},{l:'Reference Designs',v:val('references')||'—',m:true}]},
+    {n:'05',t:'Design Content',fields:[{l:'Ingredients / Composition',v:val('ingredients'),m:true},{l:'Key Benefits / Highlights',v:val('benefits'),m:true},{l:'Mandatory Print Details',v:val('mandatoryDetails'),m:true},{l:'Logo File Note',v:val('logoNote')||'—'}]},
+    {n:'06',t:'Printing Information',fields:[{l:'Printing Method',v:val('printMethod')||'—'}]},
+    {n:'07',t:'Project Timeline',fields:[{l:'Expected Deadline',v:val('deadline')},{l:'Additional Notes',v:val('notes')||'—',m:true}]},
+  ];
+
+  secs.forEach(sec=>{
+    chk(24);
+    doc.setFillColor(...C.ink);doc.roundedRect(ML,y,TW,11,2,2,'F');
+    doc.setFillColor(...C.gold);doc.rect(ML,y,16,11,'F');
+    doc.setFillColor(...C.ink);doc.rect(ML+12,y,4,11,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(...C.ink);
+    doc.text(sec.n,ML+8,y+7.2,{align:'center'});
+    doc.setFontSize(11);doc.setTextColor(...C.white);doc.text(sec.t,ML+22,y+7.2);
+    y+=15;
+    sec.fields.forEach(f=>{
+      const lns=doc.splitTextToSize(f.v||'—',TW-10);
+      const bh=f.m?Math.max(lns.length*5+6,10):10;
+      chk(22+bh);
+      doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(...C.soft);doc.setCharSpace(0.8);
+      doc.text(f.l.toUpperCase(),ML,y);doc.setCharSpace(0);y+=5;
+      doc.setFillColor(...C.grey);doc.roundedRect(ML,y,TW,bh,2,2,'F');
+      doc.setDrawColor(...C.bdr);doc.setLineWidth(0.3);doc.roundedRect(ML,y,TW,bh,2,2,'S');
+      doc.setFillColor(...C.gold);doc.roundedRect(ML,y,2.5,bh,1,1,'F');
+      doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(...C.ink);
+      doc.text(lns,ML+7,y+6);y+=bh+6;
+    });
+    y+=3;
+  });
+
+  // Closing
+  chk(50);
+  doc.setFillColor(250,246,234);doc.roundedRect(ML,y,TW,48,3,3,'F');
+  doc.setDrawColor(...C.gold);doc.setLineWidth(1.5);doc.line(ML,y,ML,y+48);
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(...C.soft);
+  const ct='Once we receive your completed brief, our team will review your requirements and reach out within 1–2 business days with an initial direction, timeline, and project proposal.';
+  const cl=doc.splitTextToSize(ct,TW-12);doc.text(cl,ML+7,y+9);y+=cl.length*5+12;
+  doc.setFont('helvetica','bolditalic');doc.setFontSize(12);doc.setTextColor(...C.gold);
+  doc.text('Looking forward to collaborating with you.',ML+7,y);y+=11;
+  doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(...C.ink);doc.text('Anil',ML+7,y);y+=5.5;
+  doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(...C.mid);
+  doc.text('Brand Strategist & Packaging Design Consultant',ML+7,y);
+
+  const fn=`Design_Brief_${(val('clientName')||'Client').replace(/\s+/g,'_')}_${now.getDate()}${now.toLocaleString('en',{month:'short'})}${now.getFullYear()}.pdf`;
+  doc.save(fn);
+  const sb=document.getElementById('success-banner');sb.style.display='block';
+  sb.scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>
