@@ -608,6 +608,7 @@ body {
 <script>
 const { jsPDF } = window.jspdf;
 function val(id){ return (document.getElementById(id)?.value||'').trim(); }
+function normalizeText(value){ return (value || '').replace(/\r\n/g, '\n').trim(); }
 
 const REQUIRED = ['productName','productCategory','productDesc','audience','packType','packSize','brandName','designStyle','ingredients','benefits','mandatoryDetails','deadline'];
 
@@ -633,6 +634,14 @@ function generatePDF(){
   const PW=210,PH=297,ML=16,MR=194,TW=178;
   let y=0;
   const C={ink:[18,17,42],gold:[200,168,75],gold2:[232,201,109],white:[255,255,255],grey:[245,243,238],mid:[160,154,144],soft:[107,101,96],bdr:[227,221,211],cream:[248,245,239]};
+  const BODY_FONT = 9.5;
+  const BODY_LINE = 4.6;
+  const FIELD_PAD_X = 7;
+  const FIELD_PAD_TOP = 5.8;
+  const LABEL_TO_BOX_GAP = 4.1;
+  const FIELD_GAP = 7.5;
+  const SECTION_TO_LABEL_GAP = 4.2;
+  doc.setLineHeightFactor(1.3);
 
   function footer(){
     const pg=doc.internal.getCurrentPageInfo().pageNumber;
@@ -646,6 +655,33 @@ function generatePDF(){
     footer();
   }
   function chk(h){if(y+h>PH-16)newPage();}
+  function chkClosing(h){if(y+h>PH-10)newPage();}
+  function wrapText(text, width){
+    const safeText = normalizeText(text) || '—';
+    const blocks = safeText.split('\n');
+    const lines = [];
+
+    blocks.forEach((block, index) => {
+      const trimmed = block.trim();
+      if(!trimmed){
+        lines.push('');
+      }else{
+        lines.push(...doc.splitTextToSize(trimmed, width));
+      }
+      if(index !== blocks.length - 1 && trimmed){
+        lines.push('');
+      }
+    });
+
+    while(lines.length > 1 && lines[lines.length - 1] === '') lines.pop();
+    return lines.length ? lines : ['—'];
+  }
+  function blockHeight(lines, multiline){
+    const lineCount = Math.max(lines.length, 1);
+    return multiline
+      ? Math.max(lineCount * BODY_LINE + 9.5, 18)
+      : 12.5;
+  }
 
   // Cover
   doc.setFillColor(...C.ink);doc.rect(0,0,PW,62,'F');
@@ -655,7 +691,7 @@ function generatePDF(){
   // dots
   for(let gx=12;gx<PW;gx+=22)for(let gy=8;gy<60;gy+=22){doc.setFillColor(201,168,75);doc.circle(gx,gy,0.35,'F');}
   doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(...C.gold);doc.setCharSpace(3);
-  doc.text('PACKAGING DESIGN STUDIO',ML+6,16);doc.setCharSpace(0);
+  doc.text('ANIL KUMBHAR',ML+6,16);doc.setCharSpace(0);
   doc.setFont('helvetica','bold');doc.setFontSize(27);doc.setTextColor(...C.white);
   doc.text('Client Design Brief',ML+6,32);
   const cn=val('clientName');
@@ -678,42 +714,50 @@ function generatePDF(){
     {n:'07',t:'Project Timeline',fields:[{l:'Expected Deadline',v:val('deadline')},{l:'Additional Notes',v:val('notes')||'—',m:true}]},
   ];
 
-  secs.forEach(sec=>{
+  secs.forEach((sec, secIndex)=>{
     chk(24);
     doc.setFillColor(...C.ink);doc.roundedRect(ML,y,TW,11,2,2,'F');
     doc.setFillColor(...C.gold);doc.rect(ML,y,16,11,'F');
     doc.setFillColor(...C.ink);doc.rect(ML+12,y,4,11,'F');
     doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(...C.ink);
     doc.text(sec.n,ML+8,y+7.2,{align:'center'});
-    doc.setFontSize(11);doc.setTextColor(...C.white);doc.text(sec.t,ML+22,y+7.2);
-    y+=15;
+    doc.setFontSize(11);doc.setTextColor(...C.white);doc.text(sec.t,ML+22,y+6.9);
+    y+=15 + SECTION_TO_LABEL_GAP;
     sec.fields.forEach(f=>{
-      const lns=doc.splitTextToSize(f.v||'—',TW-10);
-      const bh=f.m?Math.max(lns.length*5+6,10):10;
+      const lns=wrapText(f.v, TW-14);
+      const bh=blockHeight(lns, f.m);
       chk(22+bh);
       doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(...C.soft);doc.setCharSpace(0.8);
-      doc.text(f.l.toUpperCase(),ML,y);doc.setCharSpace(0);y+=5;
+      doc.text(f.l.toUpperCase(),ML,y);doc.setCharSpace(0);y+=LABEL_TO_BOX_GAP;
       doc.setFillColor(...C.grey);doc.roundedRect(ML,y,TW,bh,2,2,'F');
       doc.setDrawColor(...C.bdr);doc.setLineWidth(0.3);doc.roundedRect(ML,y,TW,bh,2,2,'S');
       doc.setFillColor(...C.gold);doc.roundedRect(ML,y,2.5,bh,1,1,'F');
-      doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(...C.ink);
-      doc.text(lns,ML+7,y+6);y+=bh+6;
+      doc.setFont('helvetica','normal');doc.setFontSize(BODY_FONT);doc.setTextColor(...C.ink);
+      doc.text(lns,ML+FIELD_PAD_X,y+FIELD_PAD_TOP,{baseline:'top'});
+      y+=bh+FIELD_GAP;
     });
-    y+=3;
+    if(secIndex !== secs.length - 1) y+=3.5;
   });
 
   // Closing
-  chk(50);
-  doc.setFillColor(250,246,234);doc.roundedRect(ML,y,TW,48,3,3,'F');
-  doc.setDrawColor(...C.gold);doc.setLineWidth(1.5);doc.line(ML,y,ML,y+48);
-  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(...C.soft);
   const ct='Once we receive your completed brief, our team will review your requirements and reach out within 1–2 business days with an initial direction, timeline, and project proposal.';
-  const cl=doc.splitTextToSize(ct,TW-12);doc.text(cl,ML+7,y+9);y+=cl.length*5+12;
+  const cl=doc.splitTextToSize(ct,TW-12);
+  const closingHeight = Math.max(46, (cl.length * 4.2) + 29);
+  chkClosing(closingHeight + 2);
+  const closingY = y;
+  doc.setFillColor(250,246,234);doc.roundedRect(ML,closingY,TW,closingHeight,3,3,'F');
+  doc.setDrawColor(...C.gold);doc.setLineWidth(1.5);doc.line(ML,closingY,ML,closingY+closingHeight);
+  doc.setFont('helvetica','normal');doc.setFontSize(BODY_FONT);doc.setTextColor(...C.soft);
+  doc.text(cl,ML+7,closingY+7.5,{baseline:'top'});
+  let closingTextY = closingY + 7.5 + (cl.length * 4.2) + 5.5;
   doc.setFont('helvetica','bolditalic');doc.setFontSize(12);doc.setTextColor(...C.gold);
-  doc.text('Looking forward to collaborating with you.',ML+7,y);y+=11;
-  doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(...C.ink);doc.text('Anil',ML+7,y);y+=5.5;
+  doc.text('Looking forward to collaborating with you.',ML+7,closingTextY);
+  closingTextY += 8.5;
+  doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(...C.ink);doc.text('Anil',ML+7,closingTextY);
+  closingTextY += 4.5;
   doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(...C.mid);
-  doc.text('Brand Strategist & Packaging Design Consultant',ML+7,y);
+  doc.text('Brand Strategist & Packaging Design Consultant',ML+7,closingTextY);
+  y = closingY + closingHeight;
 
   const fn=`Design_Brief_${(val('clientName')||'Client').replace(/\s+/g,'_')}_${now.getDate()}${now.toLocaleString('en',{month:'short'})}${now.getFullYear()}.pdf`;
   doc.save(fn);
